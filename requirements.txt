@@ -1,0 +1,11 @@
+openai
+requests
+beautifulsoup4
+pandas
+pyyaml
+schedule
+playwright
+boto3
+flask
+obs-websocket-py
+python-dotenv

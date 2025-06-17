@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+
+# Secrets
+.env
+
+# IDE configs
+.vscode/
+.idea/
+
+# MacOS junk
+.DS_Store
+
+# Temporary files
+*.log
+streaming/overlay/output.txt
+streaming/overlay/speech.mp3

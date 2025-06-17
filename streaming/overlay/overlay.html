@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Outage Feed</title>
+    <style>
+        body {
+            background-color: rgba(0,0,0,0);
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">Loading outage data...</div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/data');
+                const text = await response.text();
+                document.getElementById('content').innerText = text;
+            } catch (err) {
+                document.getElementById('content').innerText = "Error loading data";
+            }
+        }
+
+        setInterval(fetchData, 5000);
+        fetchData();
+    </script>
+</body>
+</html>
