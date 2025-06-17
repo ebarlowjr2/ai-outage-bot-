@@ -1,28 +1,26 @@
 import schedule
 import time
-from data_sources.downdetector_scraper import fetch_downdetector
-from ai_engine.summarizer import summarize_outages
+import logging
+from main import main as run_outage_check
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def job():
-    print("Running scheduled check...")
-    outages = fetch_downdetector()
+    """Scheduled job to check for outages"""
+    logging.info("Running scheduled outage check...")
+    try:
+        run_outage_check()
+    except Exception as e:
+        logging.error(f"Scheduled job failed: {e}")
 
-    if outages:
-        summary = summarize_outages(outages)
-        print("\n====== Outage Summary ======")
-        print(summary)
-        # Write summary to overlay file
-        with open("streaming/overlay/output.txt", "w") as f:
-            f.write(summary)
-    else:
-        print("No major outages found.")
-
-# Every 10 minutes for now
 schedule.every(10).minutes.do(job)
 
 if __name__ == "__main__":
-    print("Starting AI Outage Bot Scheduler...")
-    job()  # Run once on startup
+    logging.info("Starting AI Outage Bot Scheduler...")
+    
+    # Run once on startup
+    job()
+    
     while True:
         schedule.run_pending()
         time.sleep(1)

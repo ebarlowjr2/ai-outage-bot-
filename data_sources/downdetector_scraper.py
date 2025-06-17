@@ -1,20 +1,32 @@
-import requests
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
+import logging
 
 def fetch_downdetector():
-    url = 'https://downdetector.com/'
-    headers = {'User-Agent': 'Mozilla/5.0'}
-
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Get list of current major outages
-    outages = []
-    outage_blocks = soup.find_all('li', class_='entry-title')
-
-    for block in outage_blocks:
-        service = block.text.strip()
-        link = block.find('a')['href']
-        outages.append({'service': service, 'link': f'https://downdetector.com{link}'})
-
-    return outages
+    """Scrape current outages from Downdetector using Playwright"""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto('https://downdetector.com/')
+            
+            page.wait_for_load_state('networkidle')
+            
+            outages = []
+            outage_elements = page.query_selector_all('.entry-title a')
+            
+            for element in outage_elements:
+                service = element.inner_text().strip()
+                link = element.get_attribute('href')
+                if service and link:
+                    outages.append({
+                        'service': service, 
+                        'link': f'https://downdetector.com{link}' if link.startswith('/') else link
+                    })
+            
+            browser.close()
+            logging.info(f"Found {len(outages)} outages")
+            return outages
+            
+    except Exception as e:
+        logging.error(f"Error scraping Downdetector: {e}")
+        return []
